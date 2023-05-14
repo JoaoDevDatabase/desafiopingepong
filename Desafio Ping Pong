@@ -1,0 +1,32 @@
+package main
+
+import (
+	"fmt"
+	"time" // pacote time ele vai responder de acordo com o tempo que nos colocarmos para ele poder nos dar
+)
+
+func main() {
+	ping := make(chan bool) // Canal para envio de "ping"
+	pong := make(chan bool) // Canal para envio de "pong"
+
+	go jogador("ping", ping, pong)
+	go jogador("pong", pong, ping)
+
+	// Iniciar o jogo com um "ping"
+	ping <- true
+
+	// Aguardar alguns segundos antes de finalizar o programa
+	time.Sleep(5 * time.Second)
+}
+
+func jogador(nome string, canalRecebimento <-chan bool, canalEnvio chan<- bool) {
+	for {
+		<-canalRecebimento // Aguardar receber uma mensagem
+
+		fmt.Println(nome) // Imprimir o nome do jogador
+
+		time.Sleep(1 * time.Second) // Aguardar um segundo
+
+		canalEnvio <- true // Enviar mensagem para o próximo jogador
+	}
+}
